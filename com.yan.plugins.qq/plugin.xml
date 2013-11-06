@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="com.yan.plugins.qq.qqMain"
+               label="QQ">
+            <command
+                  commandId="com.yan.plugins.qq.openQQMain"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.yan.plugins.qq.category1"
+            id="com.yan.plugins.qq.openQQMain"
+            name="openQQMain">
+      </command>
+      <category
+            id="com.yan.plugins.qq.category1"
+            name="QQ">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.yan.plugins.qq.comands.OpenQQWindowCommand"
+            commandId="com.yan.plugins.qq.openQQMain">
+      </handler>
+   </extension>
+
+</plugin>

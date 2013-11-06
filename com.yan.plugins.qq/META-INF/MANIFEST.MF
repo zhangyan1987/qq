@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: QQ
+Bundle-SymbolicName: com.yan.plugins.qq;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.yan.plugins.qq.Activator
+Bundle-Vendor: YAN
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.commands,
+ org.eclipse.ui.workbench
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Export-Package: com.yan.plugins.qq
