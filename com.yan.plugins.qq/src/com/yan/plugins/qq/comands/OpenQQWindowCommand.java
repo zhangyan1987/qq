@@ -1,5 +1,7 @@
 package com.yan.plugins.qq.comands;
 
+import java.awt.Toolkit;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -12,6 +14,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -23,6 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
+import org.eclipse.ui.PlatformUI;
 
 import com.yan.plugins.qq.Activator;
 import com.yan.plugins.qq.model.User;
@@ -266,9 +270,12 @@ public class OpenQQWindowCommand extends AbstractHandler {
 	public void openListShell(){
 		if(null == listShell || listShell.isDisposed())
 			listShell = new Shell();
-		listShell.setSize(300,1000);
+		//change the height to fit the screen height
+		int height = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		listShell.setSize(300,height);
 		listShell.setText("QQ");
-		
+		//set location
+		listShell.setLocation(new Point(0, 0));
 		loadImage();
 		listShell.setImage(image);
 		listShell.setLayout(new FillLayout());
