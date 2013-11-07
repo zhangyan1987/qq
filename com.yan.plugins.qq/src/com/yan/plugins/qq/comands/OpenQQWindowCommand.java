@@ -11,6 +11,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -24,6 +26,8 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
@@ -57,6 +61,7 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 	private int openedShellCount = 0;
 
+	private TrayItem trayItem;
 	public void loadImage() {
 
 		if (image == null)
@@ -71,40 +76,12 @@ public class OpenQQWindowCommand extends AbstractHandler {
 		System.out.println("QQ is running.............");
 		if (display == null)
 			display = Display.getCurrent();
-
-		openLoginShell();
-
-		// TODO Add tray
-		// Tray
-		Tray tray = display.getSystemTray();
-		TrayItem trayItem = new TrayItem(tray, SWT.NONE);
 		loadImage();
-		trayItem.setImage(image);
-		trayItem.setText("QQ");
-		trayItem.setToolTipText("QQ");
-		trayItem.setVisible(true);
+		
 
-		// click tray,show a login shell if not login else show list shell
-		trayItem.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-
-				// no shell has been opened
-				if (openedShellCount <= 0) {
-
-					if (isLogin) {
-						openListShell();
-					}
-
-				}
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				super.widgetDefaultSelected(e);
-			}
-		});
+		// Tray
+		addTray();
+		openLoginShell();
 
 		// image.dispose();//when to dispose?
 		return null;
@@ -120,7 +97,6 @@ public class OpenQQWindowCommand extends AbstractHandler {
 			listShell.setText("QQ");
 			// set location
 			listShell.setLocation(new Point(0, 0));
-			loadImage();
 			listShell.setImage(image);
 			listShell.setLayout(new FillLayout());
 
@@ -136,7 +112,6 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 				@Override
 				public void shellClosed(ShellEvent e) {
-					System.out.println("shell close");
 					openedShellCount--;
 					e.doit = false;
 					listShell.setVisible(false);
@@ -290,6 +265,71 @@ public class OpenQQWindowCommand extends AbstractHandler {
 			}
 		}
 
+	}
+	
+	
+	public void addTray() {
+		
+		Tray tray = display.getSystemTray();
+		if(null == trayItem || trayItem.isDisposed())
+			trayItem = new TrayItem(tray, SWT.NONE);
+		
+		trayItem.setImage(image);
+		trayItem.setText("QQ");
+		trayItem.setToolTipText("QQ");
+		trayItem.setVisible(true);
+
+		// click tray,show a login shell if not login else show list shell
+		trayItem.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("click: "+e.detail);
+				// no shell has been opened
+				if (openedShellCount <= 0) {
+
+					if (isLogin) {
+						openListShell();
+					}
+					else 
+						openLoginShell();
+
+				}
+			}
+			
+		});
+		final Shell trayShell = new Shell();
+		final Menu trayMenu = new Menu(trayShell,SWT.POP_UP);
+		
+		MenuItem menuItem = new MenuItem(trayMenu, SWT.PUSH);
+		menuItem.setText("quit");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//System.out.println("hello");
+				if(loginShell!=null && !loginShell.isDisposed()) 
+					loginShell.dispose();
+				if(listShell!=null && !listShell.isDisposed()) 
+					listShell.dispose();
+				if(trayItem!=null && !trayItem.isDisposed()) 
+					trayItem.dispose();
+			}
+
+			
+			
+		});
+		
+		
+		trayItem.addMenuDetectListener(new MenuDetectListener() {
+			
+			@Override
+			public void menuDetected(MenuDetectEvent e) {
+				trayMenu.setVisible(true);
+			}
+		});
+		
+		
 	}
 
 }
