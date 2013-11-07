@@ -42,17 +42,17 @@ public class QQDAOFileImpl implements IQQDAO{
 	
 	
 	@Override
-	public boolean CheckUserInfo(User user) {
+	public User CheckUserInfo(User user) {
 		if(null == users)
 			getAllUsers();
 		if(null ==user.getQQnumber() || user.getQQnumber().equals("") || 
 				null ==user.getPasssword() || user.getPasssword().equals(""))
-		return false;
+		return null;
 		for(User temp :users) {
 			if(temp.getQQnumber().equals(user.getQQnumber()) && temp.getPasssword().equals(user.getPasssword()))
-				return true;
+				return temp;
 		}
-		return false;
+		return null;
 			
 	}
 

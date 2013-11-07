@@ -8,7 +8,7 @@ public class LoginServiceImpl implements ILoginService{
 
 	private IQQDAO qqDAO;
 	@Override
-	public boolean CheckLoginInfo(User user) {
+	public User CheckLoginInfo(User user) {
 		
 		if(qqDAO == null) {
 			qqDAO = new QQDAOFileImpl();
