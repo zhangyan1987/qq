@@ -256,15 +256,7 @@ public class OpenQQWindowCommand extends AbstractHandler {
 		return null;
 	}
 
-	/*
-	 * @Override public Object execute(Map parameterValuesByName) throws
-	 * org.eclipse.ui.commands.ExecutionException { Display display =
-	 * Display.getCurrent();
-	 * 
-	 * Shell shell = new Shell(display); shell.setSize(200, 200);
-	 * shell.setText("QQ Login"); shell.open(); while(!shell.isDisposed()) {
-	 * if(!display.readAndDispatch()) { display.sleep(); } } return null; }
-	 */
+
 
 	public void openListShell(){
 		if(null == listShell || listShell.isDisposed())
