@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 
 import com.yan.plugins.qq.Activator;
+import com.yan.plugins.qq.log.Logger;
 import com.yan.plugins.qq.model.User;
 import com.yan.plugins.qq.services.ILoginService;
 import com.yan.plugins.qq.services.LoginServiceImpl;
@@ -64,16 +65,19 @@ public class OpenQQWindowCommand extends AbstractHandler {
 	private TrayItem trayItem;
 	public void loadImage() {
 
-		if (image == null)
+		if (image == null) {
+			Logger.log("load image from /icons/minqq.jpg ");
 			image = new Image(display,
 					Activator.class.getResourceAsStream("/icons/minqq.jpg"));
+		}
+			
 	}
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// TODO Auto-generated method stub
 
-		System.out.println("QQ is running.............");
+		Logger.log("QQ start.......");
 		if (display == null)
 			display = Display.getCurrent();
 		loadImage();
@@ -88,6 +92,7 @@ public class OpenQQWindowCommand extends AbstractHandler {
 	}
 
 	public void openListShell() {
+		
 		if (null == listShell || listShell.isDisposed()) {
 			listShell = new Shell();
 			// change the height to fit the screen height
@@ -112,7 +117,9 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 				@Override
 				public void shellClosed(ShellEvent e) {
-					openedShellCount--;
+					if(openedShellCount > 0)
+						openedShellCount--;
+					Logger.log("hide listShell...active shell: "+openedShellCount);
 					e.doit = false;
 					listShell.setVisible(false);
 
@@ -122,21 +129,28 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
-					System.out.println("list Shell disposed..........");
+					if(openedShellCount > 0)
+						openedShellCount--;
+					Logger.log("listShell disposed active shell: "+openedShellCount);
+					
 
 				}
 			});
-
-			listShell.open();
 			openedShellCount++;
+			Logger.log("open listShell...active shell: "+openedShellCount);
+			listShell.open();
+			
 			while (!listShell.isDisposed()) {
 				if (!display.readAndDispatch()) {
 					display.sleep();
 				}
 			}
 		} else {
-			listShell.setVisible(true);
+			
 			openedShellCount++;
+			Logger.log("open listShell...active shell: "+openedShellCount);
+			listShell.setVisible(true);
+			
 		}
 
 	}
@@ -230,9 +244,9 @@ public class OpenQQWindowCommand extends AbstractHandler {
 					User loginUser = new User(qqNumberStr, password, null);
 					isLogin = loginService.CheckLoginInfo(loginUser);
 					if (isLogin) {
-
 						loginShell.dispose();
 						openListShell();
+						
 					} else {
 						MessageDialog messageDialog = new MessageDialog(null,
 								"login error", image, "error", 0,
@@ -252,17 +266,21 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
-
-					openedShellCount--;
+					if(openedShellCount > 0)
+						openedShellCount--;
+					Logger.log("loginShell..dispose..active shell: "+openedShellCount);
+					
 				}
 			});
-			loginShell.open();
 			openedShellCount++;
-			while (!loginShell.isDisposed()) {
+			Logger.log("open loginShell...active shell: "+openedShellCount);
+			loginShell.open();
+			
+			/*while (!loginShell.isDisposed()) {
 				if (!display.readAndDispatch()) {
 					display.sleep();
 				}
-			}
+			}*/
 		}
 
 	}
@@ -275,8 +293,8 @@ public class OpenQQWindowCommand extends AbstractHandler {
 			trayItem = new TrayItem(tray, SWT.NONE);
 		
 		trayItem.setImage(image);
-		trayItem.setText("QQ");
-		trayItem.setToolTipText("QQ");
+		trayItem.setText("linuxQQ");
+		trayItem.setToolTipText("linuxQQ");
 		trayItem.setVisible(true);
 
 		// click tray,show a login shell if not login else show list shell
@@ -284,15 +302,16 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("click: "+e.detail);
+				Logger.log("click trayItem...active shell: "+openedShellCount);
 				// no shell has been opened
 				if (openedShellCount <= 0) {
 
 					if (isLogin) {
 						openListShell();
 					}
-					else 
+					else {
 						openLoginShell();
+					}
 
 				}
 			}
@@ -307,13 +326,19 @@ public class OpenQQWindowCommand extends AbstractHandler {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				//System.out.println("hello");
-				if(loginShell!=null && !loginShell.isDisposed()) 
+				
+				if(loginShell!=null && !loginShell.isDisposed()) {
 					loginShell.dispose();
-				if(listShell!=null && !listShell.isDisposed()) 
+				}
+					
+				if(listShell!=null && !listShell.isDisposed()) {
 					listShell.dispose();
+				}
+					
 				if(trayItem!=null && !trayItem.isDisposed()) 
 					trayItem.dispose();
+				
+				Logger.log("QQ quit...active shell: "+openedShellCount);
 			}
 
 			
