@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
-import org.eclipse.ui.PlatformUI;
 
 import com.yan.plugins.qq.Activator;
 import com.yan.plugins.qq.model.User;
@@ -64,7 +63,7 @@ public class OpenQQWindowCommand extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// TODO Auto-generated method stub
 
-		System.out.println("opening QQ.............");
+		System.out.println("QQ is running.............");
 		if(display == null)
 			display = Display.getCurrent();
 		if(loginShell == null || loginShell.isDisposed()) 
