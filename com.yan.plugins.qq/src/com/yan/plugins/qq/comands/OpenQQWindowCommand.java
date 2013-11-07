@@ -40,6 +40,7 @@ import com.yan.plugins.qq.services.LoginServiceImpl;
  */
 public class OpenQQWindowCommand extends AbstractHandler {
 	
+	//add all to member
 	private ILoginService loginService = new LoginServiceImpl();
 	
 	private boolean isLogin = false;
