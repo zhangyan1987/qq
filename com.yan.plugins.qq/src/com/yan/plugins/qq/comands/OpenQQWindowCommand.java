@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
-import org.eclipse.ui.PlatformUI;
 
 import com.yan.plugins.qq.Activator;
 import com.yan.plugins.qq.model.User;
