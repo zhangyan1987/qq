@@ -1,7 +1,7 @@
 package com.yan.plugins.qq.services;
 
 import com.yan.plugins.qq.daos.IQQDAO;
-import com.yan.plugins.qq.daos.QQDAOImpl;
+import com.yan.plugins.qq.daos.QQDAOFileImpl;
 import com.yan.plugins.qq.model.User;
 
 public class LoginServiceImpl implements ILoginService{
@@ -11,7 +11,7 @@ public class LoginServiceImpl implements ILoginService{
 	public boolean CheckLoginInfo(User user) {
 		
 		if(qqDAO == null) {
-			qqDAO = new QQDAOImpl();
+			qqDAO = new QQDAOFileImpl();
 		}
 		return qqDAO.CheckUserInfo(user);
 			
@@ -19,7 +19,7 @@ public class LoginServiceImpl implements ILoginService{
 	@Override
 	public User[] getAllFriendArray() {
 		if(qqDAO == null) {
-			qqDAO = new QQDAOImpl();
+			qqDAO = new QQDAOFileImpl();
 		}
 		return qqDAO.getAllUsers().toArray(new User[]{});
 	}
