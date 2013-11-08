@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -23,8 +22,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -36,8 +33,8 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -51,6 +48,7 @@ import com.yan.plugins.qq.log.Logger;
 import com.yan.plugins.qq.model.User;
 import com.yan.plugins.qq.services.ILoginService;
 import com.yan.plugins.qq.services.LoginServiceImpl;
+import com.yan.plugins.qq.socket.ClientSocket;
 import com.yan.plugins.qq.util.ImageManager;
 
 //TDO: 最大化最小化的问题
@@ -244,7 +242,9 @@ public class QQMain {
 			userLabel.setLayoutData(formData);
 
 			// QQNumberText
-			final Text qqNumberText = new Text(loginShell, SWT.BORDER);
+			final Combo qqNumberText = new Combo(loginShell, SWT.BORDER);
+			
+			//final Text qqNumberText = new Text(loginShell, SWT.BORDER);
 			formData = new FormData();
 			formData.left = new FormAttachment(0, 120);
 			formData.right = new FormAttachment(100, -30);
@@ -376,7 +376,7 @@ public class QQMain {
 
 	}
 
-	public void openMsgShell(User receiver) {
+	public void openMsgShell(final User receiver) {
 		if (msgShell == null || msgShell.isDisposed()) {
 			msgShell = new Shell();
 			msgShell.setSize(600, 600);
@@ -411,14 +411,14 @@ public class QQMain {
 
 			// sendText//SWT.WRAP自动换行
 			final Text sendText = new Text(msgShell, SWT.BORDER | SWT.MULTI
-					| SWT.WRAP | SWT.V_SCROLL);
+					| SWT.WRAP | SWT.V_SCROLL | SWT.BORDER_SOLID);
 			formData = new FormData();
 			formData.left = new FormAttachment(0, 30);
 			formData.right = new FormAttachment(100, -270);
 			formData.top = new FormAttachment(0, 300);
 			formData.bottom = new FormAttachment(0, 540);
 			sendText.setLayoutData(formData);
-
+			
 			// recordText
 			final Text recordText = new Text(msgShell, SWT.BORDER | SWT.MULTI
 					| SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
@@ -470,15 +470,28 @@ public class QQMain {
 						e.doit = false;
 						return;
 					}
-
+					
+					
+					StringBuilder sendMsg = new StringBuilder();
+					
 					DateFormat df = new SimpleDateFormat("HH:mm:ss",
 							Locale.CHINESE);
+					
+					//make sendMsg
+					sendMsg.append(loginUser.getQQnumber()).append("::").append(receiver.getQQnumber()).append("\n");
+					sendMsg.append(loginUser.getNickName()).append("(")
+					.append(loginUser.getQQnumber()).append(")  ")
+					.append(df.format(new Date()));
+					sendMsg.append("\n").append(sendStr);
+					
+					ClientSocket cs = new ClientSocket(sendMsg.toString());
+					String result = cs.send();
 					StringBuilder sb = new StringBuilder();
 					sb.append(recordText.getText()).append("\n");
 					sb.append(loginUser.getNickName()).append("(")
 							.append(loginUser.getQQnumber()).append(")  ")
 							.append(df.format(new Date()));
-					sb.append("\n").append(sendStr);
+					sb.append("\n").append(sendStr).append("\n").append(result);
 					sendText.setText("");
 					recordText.setText(sb.toString());
 				}
