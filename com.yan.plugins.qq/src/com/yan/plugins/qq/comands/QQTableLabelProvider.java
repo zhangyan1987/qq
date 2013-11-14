@@ -3,8 +3,8 @@ package com.yan.plugins.qq.comands;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import com.yan.plugins.qq.model.User;
 import com.yan.plugins.qq.util.ImageManager;
+import com.yan.qq.common.User;
 
 public class QQTableLabelProvider extends LabelProvider {
 

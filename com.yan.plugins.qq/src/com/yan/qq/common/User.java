@@ -1,7 +1,13 @@
-package com.yan.plugins.qq.model;
+package com.yan.qq.common;
 
-public class User {
+import java.io.Serializable;
 
+public class User implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String QQnumber;
 	private String password;
 	private String nickName;

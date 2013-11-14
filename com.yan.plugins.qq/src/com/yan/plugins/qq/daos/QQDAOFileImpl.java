@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.yan.plugins.qq.Activator;
-import com.yan.plugins.qq.model.User;
+import com.yan.qq.common.User;
 
 /*
  * use local file to implement database

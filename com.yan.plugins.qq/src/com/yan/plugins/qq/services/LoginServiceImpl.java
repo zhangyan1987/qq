@@ -2,18 +2,23 @@ package com.yan.plugins.qq.services;
 
 import com.yan.plugins.qq.daos.IQQDAO;
 import com.yan.plugins.qq.daos.QQDAOFileImpl;
-import com.yan.plugins.qq.model.User;
+import com.yan.plugins.qq.socket.ClientSocket;
+import com.yan.qq.common.User;
 
 public class LoginServiceImpl implements ILoginService{
 
 	private IQQDAO qqDAO;
 	@Override
 	public User CheckLoginInfo(User user) {
-		
-		if(qqDAO == null) {
+		ClientSocket clientSocket = new ClientSocket();
+		if(clientSocket.login(user))
+			return user;
+		else 
+			return null;
+		/*if(qqDAO == null) {
 			qqDAO = new QQDAOFileImpl();
 		}
-		return qqDAO.CheckUserInfo(user);
+		return qqDAO.CheckUserInfo(user);*/
 			
 	}
 	@Override

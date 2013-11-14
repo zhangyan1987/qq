@@ -45,11 +45,11 @@ import org.eclipse.swt.widgets.TrayItem;
 
 import com.yan.plugins.qq.comands.QQTableLabelProvider;
 import com.yan.plugins.qq.log.Logger;
-import com.yan.plugins.qq.model.User;
 import com.yan.plugins.qq.services.ILoginService;
 import com.yan.plugins.qq.services.LoginServiceImpl;
 import com.yan.plugins.qq.socket.ClientSocket;
 import com.yan.plugins.qq.util.ImageManager;
+import com.yan.qq.common.User;
 
 //TDO: 最大化最小化的问题
 public class QQMain {
@@ -274,8 +274,8 @@ public class QQMain {
 					if (loginUser != null) {
 						isLogin = true;
 						loginShell.dispose();
-						trayItem.setToolTipText(loginUser.getNickName());
-						trayItem.setText(loginUser.getNickName());
+						trayItem.setToolTipText(loginUser.getQQnumber());
+						trayItem.setText(loginUser.getQQnumber());
 						openListShell();
 
 					} else {
