@@ -13,6 +13,30 @@ public class Message implements Serializable{
 
 	private String msg;
 	
+	private String sender;
+	
+	private String recevier;
+	
+	public String getSender() {
+		return sender;
+	}
+
+	public void setSender(String sender) {
+		this.sender = sender;
+	}
+
+	public String getRecevier() {
+		return recevier;
+	}
+
+	public void setRecevier(String recevier) {
+		this.recevier = recevier;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
 	public String getMsg() {
 		return msg;
 	}

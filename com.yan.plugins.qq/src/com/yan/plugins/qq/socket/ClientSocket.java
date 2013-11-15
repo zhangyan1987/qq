@@ -61,38 +61,13 @@ public class ClientSocket {
 			
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 
 			try {
-				/*if (bw != null) {
-					bw.close();
-					bw = null;
-				}
-				if (osw != null) {
-					osw.close();
-					osw = null;
-				}
-
-				if (os != null) {
-					os.close();
-					os = null;
-				}
-
-				if (isr != null) {
-					isr.close();
-					isr =null;
-				}
-
-				if (is != null) {
-					is.close();
-					is = null;
-				}
-*/
+	
 				socket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
