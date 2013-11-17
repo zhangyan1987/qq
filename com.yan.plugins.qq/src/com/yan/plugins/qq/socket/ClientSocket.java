@@ -1,88 +1,41 @@
 package com.yan.plugins.qq.socket;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import com.yan.qq.common.Message;
 import com.yan.qq.common.User;
 
-public class ClientSocket {
-
-	private String sendMsg;
-
-	public ClientSocket(String sendMsg) {
-		this.sendMsg = sendMsg;
-	}
+public class ClientSocket{
+	String host = "127.0.0.1";
+	int port = 8888;
+	public  Socket socket = null;
+	
+	
+	
+	
 
 	public ClientSocket() {
-	}
-	
-	public String send() {
-
-		String host = "127.0.0.1";
-		int port = 8888;
-		Socket socket = null;
-		StringBuilder sb = null;
-		OutputStream os = null;
-		//OutputStreamWriter osw = null;
-		PrintWriter pw = null;
-		BufferedWriter bw = null;
-		InputStream is = null;
-		InputStreamReader isr = null;
-		BufferedReader br = null;
-		String line = null;
 		try {
-			socket = new Socket(host, port);
-
-			// send
-			os = socket.getOutputStream();
-			pw = new PrintWriter(os);
-			pw.write(sendMsg);
-			pw.flush();
-			// receive
-			is = socket.getInputStream();
-			if(is.available() > 0 ) {
-				isr = new InputStreamReader(is);
-				br = new BufferedReader(isr);
-				line = br.readLine();
-				br.close();
-			}
-			
-			
-			
-
+			socket =  new Socket(host, port);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-
-			try {
-	
-				socket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
 		}
-		return line == null ? "" : line;
 	}
 	
-	public boolean login(User u) {
+	
+	
+	public  boolean login(User u) {
 		boolean result = false;
-		String host = "127.0.0.1";
-		int port = 8888;
-		Socket socket = null;
+		
+		
 
 		try {
-			socket = new Socket(host, port);
+			
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			oos.writeObject(u);
@@ -98,6 +51,20 @@ public class ClientSocket {
 
 		}
 		return result;
+	}
+	
+	
+	public  void send(Message msg) {
+
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			oos.writeObject(msg);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}  finally {
+
+		}
 	}
 	
 

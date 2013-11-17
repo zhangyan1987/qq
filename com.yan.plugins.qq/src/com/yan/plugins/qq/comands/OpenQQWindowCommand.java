@@ -19,8 +19,8 @@ public class OpenQQWindowCommand extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// TODO Auto-generated method stub
 		QQMain qqMain = new QQMain();
-		qqMain.run();
-		
+		//qqMain.QQClientstart();
+		qqMain.QQClientstart();
 		return null;
 	}
 

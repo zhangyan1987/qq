@@ -9,8 +9,7 @@ public class LoginServiceImpl implements ILoginService{
 
 	private IQQDAO qqDAO;
 	@Override
-	public User CheckLoginInfo(User user) {
-		ClientSocket clientSocket = new ClientSocket();
+	public User CheckLoginInfo(User user,ClientSocket clientSocket) {
 		if(clientSocket.login(user))
 			return user;
 		else 

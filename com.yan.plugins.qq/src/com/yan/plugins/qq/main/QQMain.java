@@ -1,6 +1,8 @@
 package com.yan.plugins.qq.main;
 
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,6 +38,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -49,6 +52,8 @@ import com.yan.plugins.qq.services.ILoginService;
 import com.yan.plugins.qq.services.LoginServiceImpl;
 import com.yan.plugins.qq.socket.ClientSocket;
 import com.yan.plugins.qq.util.ImageManager;
+import com.yan.plugins.qq.views.QQlistShell;
+import com.yan.qq.common.Message;
 import com.yan.qq.common.User;
 
 //TDO: 最大化最小化的问题
@@ -60,7 +65,7 @@ public class QQMain {
 
 	private Display display = null;
 
-	private Shell listShell = null;
+	private QQlistShell listShell = null;
 
 	private Shell loginShell = null;
 
@@ -72,11 +77,16 @@ public class QQMain {
 
 	private User loginUser;
 
+	ClientSocket clientSocket = new ClientSocket();
+
+	
+
 	// use a Set to manage all shells
 
 	private Set<Shell> ShellManager = new HashSet<Shell>();
 
-	public void run() throws ExecutionException {
+	
+	public void QQClientstart() {
 		// TODO Auto-generated method stub
 
 		Logger.log("QQ start.......");
@@ -93,13 +103,15 @@ public class QQMain {
 	public void openListShell() {
 
 		if (null == listShell || listShell.isDisposed()) {
-			listShell = new Shell();
+			listShell = new QQlistShell(clientSocket);
+			//Display.getDefault().syncExec(listShell);
+			new Thread(listShell).start();
 			ShellManager.add(listShell);
 			// change the height to fit the screen height
 			int height = (int) Toolkit.getDefaultToolkit().getScreenSize()
 					.getHeight();
 			listShell.setSize(300, height);
-			listShell.setText("QQ :" + loginUser.getNickName());
+			listShell.setText("QQ :" + loginUser.getQQnumber());
 			// set location
 			listShell.setLocation(new Point(0, 0));
 			listShell.setImage(ImageManager.getImage(ImageManager.MINI_QQ));
@@ -243,8 +255,8 @@ public class QQMain {
 
 			// QQNumberText
 			final Combo qqNumberText = new Combo(loginShell, SWT.BORDER);
-			
-			//final Text qqNumberText = new Text(loginShell, SWT.BORDER);
+
+			// final Text qqNumberText = new Text(loginShell, SWT.BORDER);
 			formData = new FormData();
 			formData.left = new FormAttachment(0, 120);
 			formData.right = new FormAttachment(100, -30);
@@ -261,23 +273,25 @@ public class QQMain {
 			formData.right = new FormAttachment(100, -5);
 			formData.bottom = new FormAttachment(userLabel, -5);
 			mainLabel.setLayoutData(formData);
-
 			// event
-			loginButton.addSelectionListener(new SelectionAdapter() {
+			
+			//login listener
+			class loginListener extends SelectionAdapter {
 
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					String qqNumberStr = qqNumberText.getText();
 					String password = passwordText.getText();
 					loginUser = new User(qqNumberStr, password, null);
-					loginUser = loginService.CheckLoginInfo(loginUser);
+					loginUser = loginService.CheckLoginInfo(loginUser,
+							clientSocket);
 					if (loginUser != null) {
 						isLogin = true;
 						loginShell.dispose();
 						trayItem.setToolTipText(loginUser.getQQnumber());
 						trayItem.setText(loginUser.getQQnumber());
 						openListShell();
-
+						
 					} else {
 						MessageDialog messageDialog = new MessageDialog(null,
 								"login error", ImageManager
@@ -292,7 +306,11 @@ public class QQMain {
 					// TODO Auto-generated method stub
 					super.widgetDefaultSelected(e);
 				}
-			});
+
+				
+			};
+			loginListener listener = new loginListener();
+			loginButton.addSelectionListener(listener);
 
 			loginShell.addDisposeListener(new DisposeListener() {
 
@@ -335,6 +353,7 @@ public class QQMain {
 
 					if (isLogin) {
 						openListShell();
+
 					} else {
 						openLoginShell();
 					}
@@ -410,24 +429,24 @@ public class QQMain {
 			cancelButton.setLayoutData(formData);
 
 			// sendText//SWT.WRAP自动换行
-			final Text sendText = new Text(msgShell, SWT.BORDER | SWT.MULTI
-					| SWT.WRAP | SWT.V_SCROLL | SWT.BORDER_SOLID);
+			listShell.sendText = new Text(msgShell, SWT.BORDER | SWT.MULTI | SWT.WRAP
+					| SWT.V_SCROLL | SWT.BORDER_SOLID);
 			formData = new FormData();
 			formData.left = new FormAttachment(0, 30);
 			formData.right = new FormAttachment(100, -270);
 			formData.top = new FormAttachment(0, 300);
 			formData.bottom = new FormAttachment(0, 540);
-			sendText.setLayoutData(formData);
-			
+			listShell.sendText.setLayoutData(formData);
+
 			// recordText
-			final Text recordText = new Text(msgShell, SWT.BORDER | SWT.MULTI
-					| SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
+			listShell.recordText = new Text(msgShell, SWT.BORDER | SWT.MULTI | SWT.WRAP
+					| SWT.READ_ONLY | SWT.V_SCROLL);
 			formData = new FormData();
 			formData.left = new FormAttachment(0, 30);
 			formData.right = new FormAttachment(100, -270);
 			formData.top = new FormAttachment(0, 39);
 			formData.bottom = new FormAttachment(0, 279);
-			recordText.setLayoutData(formData);
+			listShell.recordText.setLayoutData(formData);
 
 			final Label imageSend = new Label(msgShell, SWT.CENTER);
 			formData = new FormData();
@@ -464,41 +483,39 @@ public class QQMain {
 
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					String sendStr = sendText.getText();
+					String sendStr = listShell.sendText.getText();
 					if (null == sendStr || sendStr.trim().equals("")
 							|| sendStr.trim().length() == 0) {
 						e.doit = false;
 						return;
 					}
-					
-					
+
 					StringBuilder sendMsg = new StringBuilder();
-					
+
 					DateFormat df = new SimpleDateFormat("HH:mm:ss",
 							Locale.CHINESE);
-					
-					//make sendMsg
-					sendMsg.append(loginUser.getQQnumber()).append("::").append(receiver.getQQnumber()).append("\n");
+
+					// make sendMsg
+					sendMsg.append(loginUser.getQQnumber()).append("::")
+							.append(receiver.getQQnumber()).append("\n");
 					sendMsg.append(loginUser.getNickName()).append("(")
-					.append(loginUser.getQQnumber()).append(")  ")
-					.append(df.format(new Date()));
-					sendMsg.append("\n").append(sendStr);
-					
-					ClientSocket cs = new ClientSocket(sendMsg.toString());
-					String result = cs.send();
-					StringBuilder sb = new StringBuilder();
-					sb.append(recordText.getText()).append("\n");
-					sb.append(loginUser.getNickName()).append("(")
 							.append(loginUser.getQQnumber()).append(")  ")
 							.append(df.format(new Date()));
-					sb.append("\n").append(sendStr).append("\n").append(result);
-					sendText.setText("");
-					recordText.setText(sb.toString());
+					sendMsg.append("\n").append(sendStr);
+					Message msg = new Message();
+					msg.setMessageType(2);
+					msg.setSender(loginUser.getQQnumber());
+					msg.setRecevier(receiver.getQQnumber());
+					msg.setMsg(sendStr);
+
+					// String result = cs.send();
+					clientSocket.send(msg);
+					listShell.sendText.setText("");
 				}
 			};
 
 			sendButton.addSelectionListener(sendButtonListener);
-			sendText.addKeyListener(new KeyListener() {
+			listShell.sendText.addKeyListener(new KeyListener() {
 
 				@Override
 				public void keyReleased(KeyEvent e) {
@@ -512,7 +529,7 @@ public class QQMain {
 					System.out.println(e.keyCode);
 					if (e.keyCode == 13) {
 						e.doit = false;
-						String sendStr = sendText.getText();
+						String sendStr = listShell.sendText.getText();
 						if (null == sendStr || sendStr.trim().equals("")
 								|| sendStr.trim().length() == 0) {
 							e.doit = false;
@@ -522,13 +539,13 @@ public class QQMain {
 						DateFormat df = new SimpleDateFormat("HH:mm:ss",
 								Locale.CHINESE);
 						StringBuilder sb = new StringBuilder();
-						sb.append(recordText.getText()).append("\n");
+						sb.append(listShell.recordText.getText()).append("\n");
 						sb.append(loginUser.getNickName()).append("(")
 								.append(loginUser.getQQnumber()).append(")  ")
 								.append(df.format(new Date()));
 						sb.append("\n").append(sendStr);
-						sendText.setText("");
-						recordText.setText(sb.toString());
+						listShell.sendText.setText("");
+						listShell.recordText.setText(sb.toString());
 					}
 
 				}
